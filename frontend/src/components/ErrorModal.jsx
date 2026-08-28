@@ -8,8 +8,8 @@ export default function ErrorModal({ error, onClose, onRetry }) {
     <div style={{
       position: 'fixed',
       inset: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.75)',
-      backdropFilter: 'blur(4px)',
+      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+      backdropFilter: 'blur(2px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -17,35 +17,36 @@ export default function ErrorModal({ error, onClose, onRetry }) {
       padding: 16
     }}>
       <div style={{
-        maxWidth: 580,
+        maxWidth: 600,
         width: '100%',
-        backgroundColor: 'var(--surface-card)',
-        border: '2px solid var(--status-deny)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 24,
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.8)'
+        backgroundColor: 'var(--color-white)',
+        border: '3px solid var(--color-black)',
+        borderRadius: 'var(--radius-brutal)',
+        padding: 28,
+        boxShadow: '8px 8px 0px #FF3B30'
       }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
-              width: 36,
-              height: 36,
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--status-deny-bg)',
-              border: '1px solid var(--status-deny-border)',
+              width: 44,
+              height: 44,
+              borderRadius: 'var(--radius-brutal)',
+              backgroundColor: 'var(--neo-red)',
+              border: 'var(--border-thick)',
+              boxShadow: 'var(--shadow-brutal-sm)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--status-deny)'
+              color: 'var(--color-white)'
             }}>
-              <AlertOctagon size={20} />
+              <AlertOctagon size={24} strokeWidth={2.5} />
             </div>
             <div>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--status-deny)', letterSpacing: '-0.01em' }}>
-                PIPELINE CALL FAILED — NO REAL DATA
+              <h2 style={{ fontSize: 17, fontWeight: 900, color: 'var(--color-black)', letterSpacing: '-0.02em' }}>
+                PIPELINE EXECUTION FAILED
               </h2>
-              <p className="font-mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                Zero Mock Fallback Policy Active (AGENTS.md)
+              <p className="font-mono" style={{ fontSize: 11, fontWeight: 700, color: 'var(--neo-red)' }}>
+                ZERO MOCK FALLBACK POLICY ACTIVE (AGENTS.MD)
               </p>
             </div>
           </div>
@@ -55,36 +56,38 @@ export default function ErrorModal({ error, onClose, onRetry }) {
             style={{
               background: 'transparent',
               border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer'
+              color: 'var(--color-black)',
+              cursor: 'pointer',
+              fontWeight: 800
             }}
           >
-            <X size={18} />
+            <X size={22} strokeWidth={2.5} />
           </button>
         </div>
 
         <div style={{
-          backgroundColor: '#070A0E',
-          border: '1px solid var(--border-default)',
-          borderRadius: 'var(--radius-md)',
-          padding: 14,
+          backgroundColor: 'var(--neo-red-light)',
+          border: '2px solid var(--neo-red)',
+          borderRadius: 'var(--radius-brutal)',
+          padding: 16,
           fontFamily: 'var(--font-mono)',
           fontSize: 12,
-          color: '#FCA5A5',
-          marginBottom: 18,
+          fontWeight: 700,
+          color: '#B91C1C',
+          marginBottom: 20,
           lineHeight: 1.5,
           wordBreak: 'break-word'
         }}>
           {error}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
           <button onClick={onClose} className="btn-secondary">
             Dismiss
           </button>
           {onRetry && (
-            <button onClick={onRetry} className="btn-primary" style={{ backgroundColor: 'var(--status-deny)', borderColor: 'var(--status-deny)' }}>
-              <RefreshCw size={14} />
+            <button onClick={onRetry} className="btn-primary" style={{ backgroundColor: 'var(--neo-red)', color: 'var(--color-white)' }}>
+              <RefreshCw size={15} strokeWidth={2.5} />
               <span>Retry Execution</span>
             </button>
           )}

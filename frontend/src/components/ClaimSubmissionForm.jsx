@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Image as ImageIcon, Sparkles, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Image as ImageIcon, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
   const [invoiceFile, setInvoiceFile] = useState(null);
@@ -27,22 +27,25 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
   };
 
   return (
-    <div style={{ maxWidth: 840, margin: '36px auto', padding: '0 16px' }}>
+    <div style={{ maxWidth: 880, margin: '36px auto', padding: '0 16px' }}>
       {/* Top Banner */}
       <div style={{
+        backgroundColor: 'var(--color-white)',
+        border: 'var(--border-heavy)',
+        borderRadius: 'var(--radius-brutal)',
+        boxShadow: 'var(--shadow-brutal)',
+        padding: '20px 24px',
+        marginBottom: 24,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 24,
-        paddingBottom: 16,
-        borderBottom: '1px solid var(--border-default)'
+        justifyContent: 'space-between'
       }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
-            Claim Intake & Adjudication Dispatch
+          <h1 style={{ fontSize: 20, fontWeight: 900, color: 'var(--color-black)', marginBottom: 4 }}>
+            Claim Intake & Multi-Agent Dispatch
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-            Upload authentic customer invoice and defect media to route through the multi-agent decision engine.
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 500 }}>
+            Upload authentic customer invoice and defect media to route through the DAG decision engine.
           </p>
         </div>
 
@@ -52,41 +55,51 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
           onClick={handleLoadSample}
           className="btn-secondary"
           style={{
-            borderColor: isSampleLoaded ? '#3B82F6' : 'var(--border-default)',
-            color: isSampleLoaded ? '#93C5FD' : 'var(--text-secondary)'
+            backgroundColor: isSampleLoaded ? 'var(--neo-green-light)' : 'var(--color-white)',
+            borderColor: isSampleLoaded ? 'var(--neo-green)' : 'var(--color-black)',
+            color: 'var(--color-black)'
           }}
         >
-          <Sparkles size={14} color={isSampleLoaded ? '#60A5FA' : 'var(--text-muted)'} />
-          <span>{isSampleLoaded ? 'Sample Evidence Loaded' : 'Load Real Sample (Evidson X55i)'}</span>
+          <Sparkles size={15} strokeWidth={2.5} color={isSampleLoaded ? '#00A86B' : 'var(--color-black)'} />
+          <span>{isSampleLoaded ? 'Sample Evidence Loaded' : 'Load Sample (Evidson X55i)'}</span>
         </button>
       </div>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {/* Dual Evidence Upload Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           {/* Invoice File Intake */}
           <div style={{
-            backgroundColor: 'var(--surface-card)',
-            border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 18,
+            backgroundColor: 'var(--color-white)',
+            border: 'var(--border-heavy)',
+            borderRadius: 'var(--radius-brutal)',
+            boxShadow: 'var(--shadow-brutal)',
+            padding: 20,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <FileText size={16} color="#60A5FA" />
-              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                1. Purchase Invoice / Bill
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <div style={{
+                backgroundColor: 'var(--color-black)',
+                color: 'var(--color-white)',
+                padding: '3px 6px',
+                borderRadius: 'var(--radius-brutal)',
+                fontSize: 11,
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 800
+              }}>01</div>
+              <label style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-black)' }}>
+                Purchase Invoice / Bill
               </label>
             </div>
 
             <div style={{
-              border: '1px dashed var(--border-default)',
-              borderRadius: 'var(--radius-md)',
+              border: '2px dashed #000000',
+              borderRadius: 'var(--radius-brutal)',
               padding: '24px 16px',
               textAlign: 'center',
-              backgroundColor: invoiceFile ? 'var(--surface-subtle)' : 'transparent',
+              backgroundColor: invoiceFile ? 'var(--neo-green-light)' : 'var(--surface-subtle)',
               cursor: 'pointer',
               position: 'relative'
             }}>
@@ -109,21 +122,21 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
               />
               {invoiceFile ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <CheckCircle2 size={24} color="var(--status-approve)" />
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  <CheckCircle2 size={26} color="#00A86B" strokeWidth={2.5} />
+                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-black)' }}>
                     {invoiceFile.name}
                   </div>
-                  <div className="font-mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    {(invoiceFile.size / 1024).toFixed(1)} KB // Ready for extraction
+                  <div className="font-mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>
+                    {(invoiceFile.size / 1024).toFixed(1)} KB // EXTRACTION READY
                   </div>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                  <Upload size={22} color="var(--text-muted)" />
-                  <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                  <Upload size={24} color="var(--color-black)" strokeWidth={2.5} />
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-black)' }}>
                     Drop invoice image or PDF
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
                     JPG, PNG, WebP up to 10MB
                   </div>
                 </div>
@@ -133,27 +146,36 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
 
           {/* Product Damage File Intake */}
           <div style={{
-            backgroundColor: 'var(--surface-card)',
-            border: '1px solid var(--border-default)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 18,
+            backgroundColor: 'var(--color-white)',
+            border: 'var(--border-heavy)',
+            borderRadius: 'var(--radius-brutal)',
+            boxShadow: 'var(--shadow-brutal)',
+            padding: 20,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <ImageIcon size={16} color="#60A5FA" />
-              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                2. Visual Damage Evidence
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <div style={{
+                backgroundColor: 'var(--color-black)',
+                color: 'var(--color-white)',
+                padding: '3px 6px',
+                borderRadius: 'var(--radius-brutal)',
+                fontSize: 11,
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 800
+              }}>02</div>
+              <label style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-black)' }}>
+                Visual Damage Evidence
               </label>
             </div>
 
             <div style={{
-              border: '1px dashed var(--border-default)',
-              borderRadius: 'var(--radius-md)',
+              border: '2px dashed #000000',
+              borderRadius: 'var(--radius-brutal)',
               padding: '24px 16px',
               textAlign: 'center',
-              backgroundColor: damageFile ? 'var(--surface-subtle)' : 'transparent',
+              backgroundColor: damageFile ? 'var(--neo-green-light)' : 'var(--surface-subtle)',
               cursor: 'pointer',
               position: 'relative'
             }}>
@@ -176,22 +198,22 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
               />
               {damageFile ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <CheckCircle2 size={24} color="var(--status-approve)" />
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  <CheckCircle2 size={26} color="#00A86B" strokeWidth={2.5} />
+                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-black)' }}>
                     {damageFile.name}
                   </div>
-                  <div className="font-mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    {(damageFile.size / 1024).toFixed(1)} KB // Visual inspection ready
+                  <div className="font-mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>
+                    {(damageFile.size / 1024).toFixed(1)} KB // VISION INSPECTION READY
                   </div>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                  <Upload size={22} color="var(--text-muted)" />
-                  <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                  <Upload size={24} color="var(--color-black)" strokeWidth={2.5} />
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-black)' }}>
                     Drop product damage photo
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    High-res defect photo or close-up
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+                    Close-up defect or fracture photo
                   </div>
                 </div>
               )}
@@ -201,17 +223,29 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
 
         {/* Customer Issue Description Field */}
         <div style={{
-          backgroundColor: 'var(--surface-card)',
-          border: '1px solid var(--border-default)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 18
+          backgroundColor: 'var(--color-white)',
+          border: 'var(--border-heavy)',
+          borderRadius: 'var(--radius-brutal)',
+          boxShadow: 'var(--shadow-brutal)',
+          padding: 20
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-              3. Customer Reported Issue & Statement
-            </label>
-            <span className="font-mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              {description.length} / 1000 chars
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                backgroundColor: 'var(--color-black)',
+                color: 'var(--color-white)',
+                padding: '3px 6px',
+                borderRadius: 'var(--radius-brutal)',
+                fontSize: 11,
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 800
+              }}>03</div>
+              <label style={{ fontSize: 13, fontWeight: 800, textTransform: 'uppercase', color: 'var(--color-black)' }}>
+                Customer Statement & Issue Description
+              </label>
+            </div>
+            <span className="font-mono" style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>
+              {description.length} / 1000 CHARS
             </span>
           </div>
 
@@ -219,16 +253,17 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g., The earphone is broken from earplugs. The wire was pulled and casing cracked suddenly during usage..."
+            placeholder="e.g., The earphone is broken from earplugs. Casing cracked suddenly during usage..."
             style={{
               width: '100%',
               backgroundColor: 'var(--surface-subtle)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 'var(--radius-md)',
+              border: 'var(--border-thick)',
+              borderRadius: 'var(--radius-brutal)',
               padding: '12px 14px',
-              color: 'var(--text-primary)',
-              fontSize: 13,
+              color: 'var(--color-black)',
+              fontSize: 14,
               fontFamily: 'var(--font-sans)',
+              fontWeight: 500,
               resize: 'vertical',
               outline: 'none'
             }}
@@ -242,12 +277,14 @@ export default function ClaimSubmissionForm({ onSubmit, isProcessing }) {
             disabled={isProcessing || !description.trim()}
             className="btn-primary"
             style={{
+              padding: '14px 28px',
+              fontSize: 15,
               opacity: isProcessing || !description.trim() ? 0.6 : 1,
               cursor: isProcessing || !description.trim() ? 'not-allowed' : 'pointer'
             }}
           >
             <span>{isProcessing ? 'Adjudicating Claim...' : 'Execute Live Adjudication'}</span>
-            <ArrowRight size={16} />
+            <ArrowRight size={18} strokeWidth={2.5} />
           </button>
         </div>
       </form>

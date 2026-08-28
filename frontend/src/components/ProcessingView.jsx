@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, CheckCircle2, Clock, ShieldAlert } from 'lucide-react';
+import { Cpu, CheckCircle2, Clock } from 'lucide-react';
 
 const PIPELINE_STAGES = [
   { id: 'doc', label: 'Document Intake & Purchase Extraction', agent: 'Agent 1 (Invoice Specialist)', duration: 1200 },
@@ -20,35 +20,43 @@ export default function ProcessingView() {
   }, []);
 
   return (
-    <div style={{ maxWidth: 720, margin: '48px auto', padding: '0 16px' }}>
+    <div style={{ maxWidth: 760, margin: '48px auto', padding: '0 16px' }}>
       <div style={{
-        backgroundColor: 'var(--surface-card)',
-        border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-xl)',
+        backgroundColor: 'var(--color-white)',
+        border: 'var(--border-heavy)',
+        borderRadius: 'var(--radius-brutal)',
         padding: 32,
-        boxShadow: 'var(--shadow-lg)'
+        boxShadow: 'var(--shadow-brutal-lg)'
       }}>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid var(--border-subtle)' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          marginBottom: 24,
+          paddingBottom: 16,
+          borderBottom: 'var(--border-thick)'
+        }}>
           <div style={{
-            width: 40,
-            height: 40,
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: 'var(--accent-action-subtle)',
-            border: '1px solid #3B82F6',
+            width: 46,
+            height: 46,
+            borderRadius: 'var(--radius-brutal)',
+            backgroundColor: 'var(--neo-green)',
+            border: 'var(--border-thick)',
+            boxShadow: 'var(--shadow-brutal-sm)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#60A5FA'
+            color: 'var(--color-black)'
           }}>
-            <Cpu size={22} className="pulse-icon" />
+            <Cpu size={26} strokeWidth={2.5} />
           </div>
           <div>
-            <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>
-              Executing 5-Agent Adjudication Pipeline
+            <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--color-black)' }}>
+              Executing 5-Agent Adjudication DAG
             </h2>
-            <p className="font-mono" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              RocketRide DAP Server // Real-time DAG evaluation
+            <p className="font-mono" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>
+              ROCKETRIDE DAP // LIVE MULTI-AGENT INFERENCE
             </p>
           </div>
         </div>
@@ -67,34 +75,41 @@ export default function ProcessingView() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '12px 16px',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: isCurrent ? 'var(--surface-subtle)' : 'transparent',
-                  border: isCurrent ? '1px solid var(--border-focus)' : '1px solid var(--border-subtle)',
+                  padding: '14px 18px',
+                  borderRadius: 'var(--radius-brutal)',
+                  backgroundColor: isCurrent ? 'var(--neo-green-light)' : isCompleted ? 'var(--surface-subtle)' : 'var(--color-white)',
+                  border: isCurrent ? '2.5px solid var(--neo-green)' : 'var(--border-thick)',
+                  boxShadow: isCurrent ? 'var(--shadow-brutal-green)' : isCompleted ? 'var(--shadow-brutal-sm)' : 'none',
                   opacity: isPending ? 0.4 : 1,
-                  transition: 'all 0.25s ease'
+                  transition: 'all 0.2s ease'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   {isCompleted ? (
-                    <CheckCircle2 size={18} color="var(--status-approve)" />
+                    <CheckCircle2 size={22} color="#00A86B" strokeWidth={2.5} />
                   ) : isCurrent ? (
                     <span style={{
-                      width: 12,
-                      height: 12,
+                      width: 14,
+                      height: 14,
                       borderRadius: '50%',
-                      backgroundColor: '#3B82F6',
-                      boxShadow: '0 0 8px #3B82F6'
+                      backgroundColor: 'var(--color-black)',
+                      border: '2px solid var(--neo-green)',
+                      boxShadow: '0 0 8px var(--neo-green)'
                     }} />
                   ) : (
-                    <Clock size={16} color="var(--text-dim)" />
+                    <Clock size={20} color="var(--text-muted)" strokeWidth={2} />
                   )}
 
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: isCurrent ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                    <div style={{
+                      fontSize: 14,
+                      fontWeight: 800,
+                      color: 'var(--color-black)',
+                      textTransform: 'uppercase'
+                    }}>
                       {stage.label}
                     </div>
-                    <div className="font-mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    <div className="font-mono" style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>
                       {stage.agent}
                     </div>
                   </div>
@@ -102,9 +117,14 @@ export default function ProcessingView() {
 
                 <div className="font-mono" style={{
                   fontSize: 11,
-                  color: isCompleted ? 'var(--status-approve)' : isCurrent ? '#60A5FA' : 'var(--text-dim)'
+                  fontWeight: 800,
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-brutal)',
+                  border: '1.5px solid #000000',
+                  backgroundColor: isCompleted ? 'var(--neo-green)' : isCurrent ? 'var(--color-black)' : 'var(--surface-subtle)',
+                  color: isCompleted ? 'var(--color-black)' : isCurrent ? 'var(--color-white)' : 'var(--text-muted)'
                 }}>
-                  {isCompleted ? 'COMPLETED' : isCurrent ? 'EVALUATING...' : 'QUEUED'}
+                  {isCompleted ? 'COMPLETED' : isCurrent ? 'EVALUATING' : 'QUEUED'}
                 </div>
               </div>
             );
