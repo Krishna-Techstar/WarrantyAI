@@ -20,22 +20,22 @@ export default function BentoResultView({ result, onNewClaim }) {
   }
 
   const {
-    claim_id = 'CLM-2018-EVIDSON-834',
+    claim_id = 'CLM-UNIDENTIFIED',
     recommended_action = 'deny',
-    overall_confidence = 99,
+    overall_confidence = 90,
     route = 'auto',
     document_summary = {},
     vision_summary = {},
     warranty_summary = {},
     evidence_weights = [],
-    decision_explanation = '',
+    decision_explanation = 'No decision explanation provided.',
     risk_flags = [],
     raw_pipeline_output = ''
   } = result;
 
   const isDeny = recommended_action.toLowerCase() === 'deny';
   const isRepair = recommended_action.toLowerCase() === 'repair';
-  const severityScore = Number(vision_summary.severity_score) || 9;
+  const severityScore = Number(vision_summary.severity_score) || 5;
 
   const handleCopyExplanation = () => {
     navigator.clipboard.writeText(decision_explanation);
@@ -92,11 +92,11 @@ export default function BentoResultView({ result, onNewClaim }) {
         <div className="bento-card bento-col-5" style={{
           backgroundColor: isDeny ? 'var(--neo-red)' : 'var(--neo-green)',
           color: isDeny ? 'var(--color-white)' : 'var(--color-black)',
-          boxShadow: isDeny ? '6px 6px 0px #050505' : '6px 6px 0px #050505'
+          boxShadow: '6px 6px 0px #050505'
         }}>
           <div className="bento-card-header" style={{ borderColor: 'var(--color-black)' }}>
             <div className="bento-card-title" style={{ color: isDeny ? 'var(--color-white)' : 'var(--color-black)' }}>
-              <ShieldAlert size={18} strokeWidth={2.5} />
+              {isDeny ? <ShieldAlert size={18} strokeWidth={2.5} /> : <ShieldCheck size={18} strokeWidth={2.5} />}
               <span>Adjudication Verdict</span>
             </div>
             <div style={{
@@ -106,8 +106,7 @@ export default function BentoResultView({ result, onNewClaim }) {
               borderRadius: 'var(--radius-brutal)',
               fontFamily: 'var(--font-mono)',
               fontSize: 11,
-              fontWeight: 900,
-              boxShadow: '2px 2px 0px rgba(0,0,0,0.3)'
+              fontWeight: 900
             }}>
               {route === 'auto' ? 'AUTO-CLOSED' : route.toUpperCase()}
             </div>
@@ -126,7 +125,7 @@ export default function BentoResultView({ result, onNewClaim }) {
             </div>
             <div style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 36,
+              fontSize: 34,
               fontWeight: 900,
               color: isDeny ? 'var(--color-white)' : 'var(--color-black)',
               letterSpacing: '-0.03em',
@@ -167,16 +166,16 @@ export default function BentoResultView({ result, onNewClaim }) {
             paddingTop: 12,
             borderTop: 'var(--border-thick)'
           }}>
-            PATH: IMMEDIATE CUSTOMER EXPLANATION DISPATCHED
+            PATH: {isDeny ? 'POLICY NOTICE DISPATCHED' : 'SERVICE WORK-ORDER DISPATCHED'}
           </div>
         </div>
 
-        {/* TILE 2: Evidence Attribution Matrix (7 cols - SIGNATURE ELEMENT) */}
+        {/* TILE 2: Evidence Attribution Matrix (7 cols) */}
         <div className="bento-card bento-col-7">
           <div className="bento-card-header">
             <div className="bento-card-title">
               <CheckCircle2 size={18} strokeWidth={2.5} color="var(--color-black)" />
-              <span>Evidence Attribution Matrix (Attribution Ledger)</span>
+              <span>Evidence Attribution Matrix</span>
             </div>
             <span className="font-mono" style={{
               backgroundColor: 'var(--neo-green)',
@@ -269,7 +268,7 @@ export default function BentoResultView({ result, onNewClaim }) {
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Product Name</div>
               <div style={{ fontWeight: 900, color: 'var(--color-black)' }}>
-                {document_summary.product_name || 'Evidson Audio X55i Earphones'}
+                {document_summary.product_name || 'Not Provided'}
               </div>
             </div>
 
@@ -277,13 +276,13 @@ export default function BentoResultView({ result, onNewClaim }) {
               <div>
                 <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Purchase Date</div>
                 <div className="font-mono" style={{ fontWeight: 900, color: 'var(--color-black)' }}>
-                  {document_summary.purchase_date || '2018-10-06'}
+                  {document_summary.purchase_date || 'Unknown'}
                 </div>
               </div>
               <div>
                 <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Amount Paid</div>
                 <div className="font-mono" style={{ fontWeight: 900, color: 'var(--color-black)' }}>
-                  ₹{document_summary.price || 549} {document_summary.currency || 'INR'}
+                  {document_summary.price ? `${document_summary.currency || 'INR'} ${Number(document_summary.price).toLocaleString()}` : 'N/A'}
                 </div>
               </div>
             </div>
@@ -291,7 +290,7 @@ export default function BentoResultView({ result, onNewClaim }) {
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Seller & Platform</div>
               <div style={{ color: 'var(--color-black)', fontWeight: 700 }}>
-                {document_summary.retailer || 'Amazon.in (Revnova Technology)'}
+                {document_summary.retailer || 'Authorized Retailer'}
               </div>
             </div>
 
@@ -311,23 +310,24 @@ export default function BentoResultView({ result, onNewClaim }) {
               <Eye size={16} strokeWidth={2.5} />
               <span>Vision Damage</span>
             </div>
-            <span className="sticker-badge sticker-badge-deny" style={{ fontSize: 10 }}>
+            <span className={`sticker-badge ${severityScore > 6 ? 'sticker-badge-deny' : 'sticker-badge-approve'}`} style={{ fontSize: 10 }}>
               SEVERITY {severityScore}/10
             </span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
-            {/* Stepped Severity Equalizer */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Damage Severity</span>
-                <span className="font-mono" style={{ fontSize: 11, fontWeight: 900, color: 'var(--neo-red)' }}>{severityScore} / 10</span>
+                <span className="font-mono" style={{ fontSize: 11, fontWeight: 900, color: severityScore > 6 ? 'var(--neo-red)' : 'var(--neo-green-dark)' }}>
+                  {severityScore} / 10
+                </span>
               </div>
               <div className="severity-bar">
                 {Array.from({ length: 10 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className={`severity-block ${idx < severityScore ? 'active-red' : ''}`}
+                    className={`severity-block ${idx < severityScore ? (severityScore > 6 ? 'active-red' : 'active-green') : ''}`}
                   />
                 ))}
               </div>
@@ -336,14 +336,14 @@ export default function BentoResultView({ result, onNewClaim }) {
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Defect Description</div>
               <div style={{ color: 'var(--color-black)', fontWeight: 800 }}>
-                {vision_summary.damage_type || 'Cracked earbud casing exposing wires; stripped cable near 3.5mm jack'}
+                {vision_summary.damage_type || 'Defect described in claim'}
               </div>
             </div>
 
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Assessed Cause</div>
-              <div style={{ color: 'var(--neo-red)', fontWeight: 900 }}>
-                {vision_summary.likely_cause === 'accidental_damage' ? 'Accidental Physical Damage (Uncovered)' : vision_summary.likely_cause}
+              <div style={{ color: vision_summary.likely_cause === 'manufacturing_defect' ? '#00A86B' : 'var(--neo-red)', fontWeight: 900 }}>
+                {vision_summary.likely_cause ? vision_summary.likely_cause.replace(/_/g, ' ').toUpperCase() : 'UNDER ASSESSMENT'}
               </div>
             </div>
 
@@ -371,8 +371,8 @@ export default function BentoResultView({ result, onNewClaim }) {
               <Calendar size={16} strokeWidth={2.5} />
               <span>Warranty Eligibility</span>
             </div>
-            <span className="sticker-badge sticker-badge-deny" style={{ fontSize: 10 }}>
-              EXPIRED
+            <span className={`sticker-badge ${warranty_summary.warranty_active ? 'sticker-badge-approve' : 'sticker-badge-deny'}`} style={{ fontSize: 10 }}>
+              {warranty_summary.warranty_active ? 'ACTIVE' : 'EXPIRED'}
             </span>
           </div>
 
@@ -381,28 +381,30 @@ export default function BentoResultView({ result, onNewClaim }) {
               <div>
                 <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Policy Window</div>
                 <div className="font-mono" style={{ color: 'var(--color-black)', fontWeight: 900 }}>
-                  {warranty_summary.policy_period_months || 6} Months (Standard)
+                  {warranty_summary.policy_period_months || 12} Months
                 </div>
               </div>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Policy Cutoff</div>
-                <div className="font-mono" style={{ color: 'var(--neo-red)', fontWeight: 900 }}>
-                  06-Apr-2019
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Policy Expiry</div>
+                <div className="font-mono" style={{ color: warranty_summary.warranty_active ? '#00A86B' : 'var(--neo-red)', fontWeight: 900 }}>
+                  {warranty_summary.expiry_date || 'Calculated on Purchase'}
                 </div>
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Time Elapsed Since Purchase</div>
-              <div className="font-mono" style={{ color: 'var(--neo-red)', fontWeight: 900 }}>
-                {warranty_summary.days_overdue || 2880} Days Overdue ({'>'} 7 Years)
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Time Status</div>
+              <div className="font-mono" style={{ color: warranty_summary.warranty_active ? '#00A86B' : 'var(--neo-red)', fontWeight: 900 }}>
+                {warranty_summary.warranty_active
+                  ? `${warranty_summary.days_remaining} Days Remaining in Coverage`
+                  : `${warranty_summary.days_overdue} Days Overdue (Coverage Ended)`}
               </div>
             </div>
 
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Eligibility Gate</div>
-              <div style={{ color: 'var(--neo-red)', fontWeight: 800 }}>
-                Outside Return & Warranty Coverage Window
+              <div style={{ color: warranty_summary.warranty_active ? '#00A86B' : 'var(--neo-red)', fontWeight: 800 }}>
+                {warranty_summary.warranty_active ? 'Within Active Warranty Window' : 'Outside Return & Warranty Coverage Window'}
               </div>
             </div>
           </div>
