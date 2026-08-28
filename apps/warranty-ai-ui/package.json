@@ -1,0 +1,43 @@
+{
+  "name": "krishna-warranty-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Warranty AI — a RocketRide app",
+  "license": "MIT",
+  "appManifest": {
+    "id": "krishna.warranty-ai",
+    "publisher": "krishna",
+    "name": "Warranty AI",
+    "description": "Warranty AI — a RocketRide app",
+    "icon": "./icon.svg",
+    "readme": "./README.md",
+    "categories": [
+      "custom"
+    ],
+    "mode": "free",
+    "authenticated": false,
+    "projectId": "00f6616b-93b8-4d09-8340-f8b6d726f5cf"
+  },
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "tsc --noEmit && rsbuild build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lucide-react": "^1.35.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rocketride": "file:../../.rocketride/client/rocketride.tgz",
+    "shell": "file:../../.rocketride/shell/shell.tgz"
+  },
+  "devDependencies": {
+    "@module-federation/rsbuild-plugin": "2.5.1",
+    "@rsbuild/core": "~2.0.11",
+    "@rsbuild/plugin-react": "~2.0.1",
+    "@types/node": "^20.19.41",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "react-refresh": "^0.14.2",
+    "typescript": "^5.3.0"
+  }
+}
