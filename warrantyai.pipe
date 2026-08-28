@@ -1,0 +1,553 @@
+{
+  "components": [
+    {
+      "id": "webhook_intake",
+      "provider": "webhook",
+      "config": {
+        "hideForm": true,
+        "mode": "Source",
+        "parameters": {},
+        "type": "webhook"
+      },
+      "ui": {
+        "position": {
+          "x": 40,
+          "y": 320
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      }
+    },
+    {
+      "id": "question_document_agent",
+      "provider": "question",
+      "config": {
+        "type": "question",
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 460,
+          "y": 40
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "text",
+          "from": "webhook_intake"
+        }
+      ]
+    },
+    {
+      "id": "prompt_document_agent",
+      "provider": "prompt",
+      "config": {
+        "instructions": [
+          "You are a document extraction specialist for a warranty claims system. You will be given an invoice or purchase receipt (as an image or text). Your job is to extract structured purchase data accurately, even if the document is low quality, partially cropped, or informally formatted.\n\nEXTRACT the following fields:\n- product_name (string): the specific product purchased\n- brand (string): manufacturer/brand name if visible\n- purchase_date (string, format YYYY-MM-DD): the date of purchase. If only partial date is visible, extract what you can and flag it.\n- price (number): purchase price, in the currency shown. Extract the number only.\n- currency (string): e.g. \"INR\", \"USD\" \u2014 infer from symbols if not labeled\n- serial_number (string or null): product serial/IMEI/model number if present, else null\n- retailer (string or null): store or platform name if visible\n- document_quality (string): one of \"clear\", \"readable_with_gaps\", \"poor_illegible\"\n- extraction_confidence (number 0-100): your confidence in the accuracy of extracted date and price specifically, since these two fields matter most for warranty validity\n\nRULES:\n- If a field is not visible or you cannot determine it, use null \u2014 do NOT guess or fabricate a value.\n- If the document appears to be edited, screenshotted from another screenshot, or shows signs of tampering (mismatched fonts, misaligned text, inconsistent formatting), set a field \"tamper_flag\": true and briefly note why in \"tamper_notes\".\n- If you cannot read the document at all, set document_quality to \"poor_illegible\" and still return the JSON structure with nulls \u2014 never refuse to respond.\n- Do not include any text outside the JSON object. No preamble, no explanation, no markdown fences.\n\nOUTPUT FORMAT (strict JSON, no other text):\n{\n  \"product_name\": string or null,\n  \"brand\": string or null,\n  \"purchase_date\": string or null,\n  \"price\": number or null,\n  \"currency\": string or null,\n  \"serial_number\": string or null,\n  \"retailer\": string or null,\n  \"document_quality\": string,\n  \"extraction_confidence\": number,\n  \"tamper_flag\": boolean,\n  \"tamper_notes\": string or null\n}"
+        ],
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 660,
+          "y": 40
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "question_document_agent"
+        }
+      ]
+    },
+    {
+      "id": "llm_document_agent",
+      "provider": "llm_openai_api",
+      "config": {
+        "profile": "custom",
+        "custom": {
+          "base_url": "https://api.groq.com/openai/v1",
+          "model": "openai/gpt-oss-120b",
+          "modelTotalTokens": 8192,
+          "apikey": "${ROCKETRIDE_GROQ_KEY}"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 860,
+          "y": 40
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "prompt_document_agent"
+        }
+      ]
+    },
+    {
+      "id": "doc_data_converter",
+      "provider": "answer_documents",
+      "config": {
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1060,
+          "y": 40
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "llm_document_agent"
+        }
+      ]
+    },
+    {
+      "id": "question_vision_agent",
+      "provider": "question",
+      "config": {
+        "type": "question",
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 460,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "text",
+          "from": "webhook_intake"
+        }
+      ]
+    },
+    {
+      "id": "prompt_vision_agent",
+      "provider": "prompt",
+      "config": {
+        "instructions": [
+          "You are a visual damage assessment specialist for a warranty claims system. You will be given an image or video frame(s) showing a claimed product defect or damage. Your job is to assess what you see honestly and flag anything suspicious \u2014 you are the fraud-resistance layer of this system, so be skeptical, not agreeable.\n\nANALYZE the following:\n- damage_visible (boolean): is there visible damage/defect in the image at all?\n- damage_type (string): describe the type of damage in a few words (e.g. \"cracked screen\", \"hinge separation\", \"water damage discoloration\", \"no damage visible\")\n- severity_score (number 1-10): 1 = cosmetic/minor, 10 = product completely non-functional\n- likely_cause (string): one of \"manufacturing_defect\", \"wear_and_tear\", \"accidental_damage\", \"unclear\"\n- authenticity_confidence (number 0-100): how confident are you this photo genuinely depicts THIS specific claimed product and damage, rather than being reused, stock imagery, AI-generated, or a screenshot of another source\n- authenticity_flags (array of strings): list specific red flags if any exist, e.g. \"watermark visible\", \"reverse-image-search-style stock photo appearance\", \"inconsistent lighting/shadows suggesting composite image\", \"image resolution/compression suggests screenshot of a screenshot\". Empty array if none.\n- image_quality (string): one of \"clear\", \"blurry_but_usable\", \"too_poor_to_assess\"\n\nRULES:\n- Do not assume good faith. If something looks staged, reused, or inconsistent, say so in authenticity_flags \u2014 this protects the business from fraud.\n- If image quality is too poor to make a reliable assessment, set image_quality to \"too_poor_to_assess\" and lower your severity_score and authenticity_confidence accordingly rather than guessing.\n- Never state certainty you don't have. Use the confidence fields honestly \u2014 a 95% confidence should mean you'd bet on it.\n- If no damage is visible at all, still return valid JSON with damage_visible: false \u2014 do not refuse to answer.\n- Output strict JSON only. No preamble, no explanation, no markdown fences.\n\nOUTPUT FORMAT (strict JSON, no other text):\n{\n  \"damage_visible\": boolean,\n  \"damage_type\": string,\n  \"severity_score\": number,\n  \"likely_cause\": string,\n  \"authenticity_confidence\": number,\n  \"authenticity_flags\": [string],\n  \"image_quality\": string\n}"
+        ],
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 660,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "question_vision_agent"
+        }
+      ]
+    },
+    {
+      "id": "llm_vision_agent",
+      "provider": "llm_openai_api",
+      "config": {
+        "profile": "custom",
+        "custom": {
+          "base_url": "https://api.groq.com/openai/v1",
+          "model": "openai/gpt-oss-120b",
+          "modelTotalTokens": 8192,
+          "apikey": "${ROCKETRIDE_GROQ_KEY}"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 860,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "prompt_vision_agent"
+        }
+      ]
+    },
+    {
+      "id": "vision_data_converter",
+      "provider": "answer_documents",
+      "config": {
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1060,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "llm_vision_agent"
+        }
+      ]
+    },
+    {
+      "id": "question_claim_agent",
+      "provider": "question",
+      "config": {
+        "type": "question",
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 460,
+          "y": 360
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "text",
+          "from": "webhook_intake"
+        }
+      ]
+    },
+    {
+      "id": "prompt_claim_agent",
+      "provider": "prompt",
+      "config": {
+        "instructions": [
+          "You are a customer complaint classifier for a warranty claims system. You will be given a customer's written description of a product problem. Customers write informally \u2014 expect typos, slang, regional phrasing, incomplete sentences, and sometimes frustration or sarcasm. Your job is to understand the actual technical issue despite imperfect language, not to penalize the customer for how they wrote it.\n\nCLASSIFY the following:\n- issue_category (string): one of \"hardware_failure\", \"manufacturing_defect\", \"accidental_damage\", \"software_issue\", \"unclear_insufficient_info\"\n- issue_summary (string): a clean, one-sentence restatement of the problem in plain technical language\n- customer_tone (string): one of \"neutral\", \"frustrated\", \"urgent\", \"confused\" \u2014 this is for routing/prioritization only, not for judging claim validity\n- self_reported_cause (string or null): if the customer mentions how the damage happened (e.g. \"it fell\", \"it just stopped working\"), extract that verbatim intent here\n- accidental_damage_admission (boolean): true only if the customer explicitly describes an accident (dropped, spilled liquid, hit, etc.) themselves \u2014 do not infer this from tone or unrelated details\n- clarity_confidence (number 0-100): how confident you are that you understood the actual technical issue from the text given\n\nRULES:\n- Do not let sarcasm, ALL CAPS, or frustrated tone affect issue_category \u2014 a frustrated customer can still have a legitimate manufacturing defect claim.\n- If the description is too vague to classify (e.g. \"it's broken please help\"), set issue_category to \"unclear_insufficient_info\" rather than guessing \u2014 this should route to human review, not a wrong automated guess.\n- Correct for obvious typos/slang mentally but do not comment on the customer's writing quality in your output.\n- Output strict JSON only. No preamble, no explanation, no markdown fences.\n\nOUTPUT FORMAT (strict JSON, no other text):\n{\n  \"issue_category\": string,\n  \"issue_summary\": string,\n  \"customer_tone\": string,\n  \"self_reported_cause\": string or null,\n  \"accidental_damage_admission\": boolean,\n  \"clarity_confidence\": number\n}"
+        ],
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 660,
+          "y": 360
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "question_claim_agent"
+        }
+      ]
+    },
+    {
+      "id": "llm_claim_agent",
+      "provider": "llm_openai_api",
+      "config": {
+        "profile": "custom",
+        "custom": {
+          "base_url": "https://api.groq.com/openai/v1",
+          "model": "openai/gpt-oss-120b",
+          "modelTotalTokens": 8192,
+          "apikey": "${ROCKETRIDE_GROQ_KEY}"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 860,
+          "y": 360
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "prompt_claim_agent"
+        }
+      ]
+    },
+    {
+      "id": "claim_data_converter",
+      "provider": "answer_documents",
+      "config": {
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1060,
+          "y": 360
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "llm_claim_agent"
+        }
+      ]
+    },
+    {
+      "id": "question_warranty_check",
+      "provider": "question",
+      "config": {
+        "type": "question",
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1060,
+          "y": -100
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "text",
+          "from": "webhook_intake"
+        }
+      ]
+    },
+    {
+      "id": "prompt_warranty_check",
+      "provider": "prompt",
+      "config": {
+        "instructions": [
+          "You are a simple warranty-eligibility calculator. You will be given a purchase_date and a warranty_duration_months. Perform basic date arithmetic only \u2014 do not reason about anything else.\n\nINPUT: purchase_date (YYYY-MM-DD), warranty_duration_months (number), today's date is provided or assume current system date.\n\nCALCULATE:\n- warranty_expiry_date (string, YYYY-MM-DD): purchase_date + warranty_duration_months\n- warranty_active (boolean): true if today is before warranty_expiry_date\n- days_remaining_or_expired (number): positive number of days remaining if active, negative number of days since expiry if not active\n\nRULES:\n- This is pure arithmetic. Do not apply judgment, exceptions, or leniency.\n- If purchase_date is null or invalid, return warranty_active: false and add a field \"error\": \"invalid_purchase_date\".\n- Output strict JSON only. No preamble, no explanation, no markdown fences.\n\nOUTPUT FORMAT (strict JSON, no other text):\n{\n  \"warranty_expiry_date\": string or null,\n  \"warranty_active\": boolean,\n  \"days_remaining_or_expired\": number or null,\n  \"error\": string or null\n}"
+        ],
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1260,
+          "y": -100
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "documents",
+          "from": "doc_data_converter"
+        },
+        {
+          "lane": "questions",
+          "from": "question_warranty_check"
+        }
+      ]
+    },
+    {
+      "id": "llm_warranty_check",
+      "provider": "llm_openai_api",
+      "config": {
+        "profile": "custom",
+        "custom": {
+          "base_url": "https://api.groq.com/openai/v1",
+          "model": "openai/gpt-oss-120b",
+          "modelTotalTokens": 8192,
+          "apikey": "${ROCKETRIDE_GROQ_KEY}"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1460,
+          "y": -100
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "prompt_warranty_check"
+        }
+      ]
+    },
+    {
+      "id": "warranty_data_converter",
+      "provider": "answer_documents",
+      "config": {
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1660,
+          "y": -100
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "llm_warranty_check"
+        }
+      ]
+    },
+    {
+      "id": "question_decision_agent",
+      "provider": "question",
+      "config": {
+        "type": "question",
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1660,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "text",
+          "from": "webhook_intake"
+        }
+      ]
+    },
+    {
+      "id": "prompt_decision_agent",
+      "provider": "prompt",
+      "config": {
+        "instructions": [
+          "You are the senior decision-maker in a warranty claims system. You will be given four pieces of structured evidence about a single claim: document extraction results, visual damage analysis, customer complaint classification, and warranty eligibility status. Your job is to weigh all four together and produce one clear, well-reasoned, auditable decision.\n\nYou will receive JSON objects from four upstream agents:\n1. document_data (invoice/purchase extraction \u2014 includes tamper_flag)\n2. vision_data (image/video analysis \u2014 includes authenticity_confidence and authenticity_flags)\n3. claim_data (customer description classification \u2014 includes accidental_damage_admission)\n4. warranty_data (eligibility check \u2014 includes warranty_active)\n\nDECIDE the following:\n- recommended_action (string): one of \"repair\", \"replace\", \"refund\", \"deny\"\n- overall_confidence (number 0-100): your genuine confidence in this specific recommendation, weighing all evidence quality \u2014 not just an average of the input confidences\n- route (string): one of \"auto\" (confidence > 90), \"verify\" (confidence 70-90), \"human_review\" (confidence < 70). This must match overall_confidence exactly using these thresholds.\n- reasoning_factors (object): a breakdown showing how much weight each evidence type contributed, e.g. {\"warranty_eligibility\": \"30%\", \"fault_evidence\": \"35%\", \"claim_consistency\": \"20%\", \"authenticity_check\": \"15%\"} \u2014 weights should sum to 100 and reflect this specific claim, not be identical every time\n- decision_explanation (string): a 2-4 sentence human-readable explanation of WHY you reached this decision, written for a warranty manager to read, referencing specific evidence (e.g. \"Warranty is active with 45 days remaining. Vision analysis shows severity 7/10 hinge damage consistent with manufacturing defect. No accidental damage was admitted by the customer.\")\n- risk_flags (array of strings): carry forward any tamper_flag, low authenticity_confidence, or accidental_damage_admission signals that a human reviewer should know about, even if they didn't change your final decision\n\nDECISION LOGIC TO APPLY:\n- If warranty_active is false \u2192 recommended_action should almost always be \"deny\", unless there is strong evidence of a manufacturing defect claim made shortly after expiry that the company might honor as goodwill \u2014 in that case still recommend \"deny\" but note this nuance in decision_explanation and route to \"human_review\" regardless of confidence.\n- If accidental_damage_admission is true \u2192 lean toward \"deny\" or \"repair\" (not free replace/refund), since accidental damage is typically not warranty-covered.\n- If vision_data.authenticity_confidence is below 60 OR authenticity_flags is non-empty \u2192 cap overall_confidence at 65 regardless of other evidence, forcing human_review. Do not let a well-written invoice or claim text override visual fraud signals.\n- If document_data.tamper_flag is true \u2192 cap overall_confidence at 50, forcing human_review.\n- If claim_data.issue_category is \"unclear_insufficient_info\" \u2192 cap overall_confidence at 60.\n- Prefer \"repair\" over \"replace\" over \"refund\" when severity_score is moderate (4-6) and no urgency factors exist, since this is typically lower cost \u2014 but let genuine severity (7+) or repeated failure patterns push toward replace/refund.\n\nRULES:\n- Never output overall_confidence above 90 if ANY of the capping conditions above apply \u2014 check them explicitly before finalizing your confidence number.\n- Be conservative: when evidence conflicts (e.g. clean invoice but suspicious image), let the more skeptical signal dominate the confidence score.\n- decision_explanation must be understandable by a non-technical warranty manager, not restate the JSON fields.\n- Output strict JSON only. No preamble, no explanation, no markdown fences.\n\nOUTPUT FORMAT (strict JSON, no other text):\n{\n  \"recommended_action\": string,\n  \"overall_confidence\": number,\n  \"route\": string,\n  \"reasoning_factors\": object,\n  \"decision_explanation\": string,\n  \"risk_flags\": [string]\n}"
+        ],
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1860,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "documents",
+          "from": "doc_data_converter"
+        },
+        {
+          "lane": "documents",
+          "from": "vision_data_converter"
+        },
+        {
+          "lane": "documents",
+          "from": "claim_data_converter"
+        },
+        {
+          "lane": "documents",
+          "from": "warranty_data_converter"
+        },
+        {
+          "lane": "questions",
+          "from": "question_decision_agent"
+        }
+      ]
+    },
+    {
+      "id": "llm_decision_agent",
+      "provider": "llm_openai_api",
+      "config": {
+        "profile": "custom",
+        "custom": {
+          "base_url": "https://api.groq.com/openai/v1",
+          "model": "openai/gpt-oss-120b",
+          "modelTotalTokens": 8192,
+          "apikey": "${ROCKETRIDE_GROQ_KEY}"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 2060,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "prompt_decision_agent"
+        }
+      ]
+    },
+    {
+      "id": "guardrails_validator",
+      "provider": "guardrails",
+      "config": {
+        "profile": "strict",
+        "strict": {
+          "expected_format": "json",
+          "max_tokens_estimate": 4096,
+          "policy_mode": "warn"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 2260,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "llm_decision_agent"
+        }
+      ]
+    },
+    {
+      "id": "response_decision",
+      "provider": "response_answers",
+      "config": {
+        "laneName": "answers"
+      },
+      "ui": {
+        "position": {
+          "x": 2460,
+          "y": 200
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "guardrails_validator"
+        }
+      ]
+    }
+  ],
+  "project_id": "88665959-393b-4344-ba6a-943ddd210bf1",
+  "version": 1,
+  "isLocked": false,
+  "snapToGrid": true,
+  "snapGridSize": [
+    10,
+    10
+  ],
+  "docRevision": 3
+}

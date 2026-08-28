@@ -1,0 +1,26 @@
+# Environment & Keys
+.env
+.env.local
+.env.*.local
+
+# Virtual Environment & Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+
+# RocketRide local runtime
+.rocketride/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
