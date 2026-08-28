@@ -29,6 +29,12 @@ export default function App() {
       }
       formData.append('description', formDataPayload.description);
       formData.append('use_sample', formDataPayload.use_sample ? 'true' : 'false');
+      if (formDataPayload.product_name) formData.append('product_name', formDataPayload.product_name);
+      if (formDataPayload.purchase_date) formData.append('purchase_date', formDataPayload.purchase_date);
+      if (formDataPayload.price) formData.append('price', formDataPayload.price);
+      if (formDataPayload.currency) formData.append('currency', formDataPayload.currency);
+      if (formDataPayload.retailer) formData.append('retailer', formDataPayload.retailer);
+      if (formDataPayload.damage_type) formData.append('damage_type', formDataPayload.damage_type);
 
       const response = await fetch('http://127.0.0.1:8000/api/adjudicate', {
         method: 'POST',
