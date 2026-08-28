@@ -11,7 +11,9 @@ export default function BentoResultView({ result, onNewClaim }) {
   if (!result) {
     return (
       <div style={{ maxWidth: 800, margin: '48px auto', textAlign: 'center', padding: 32 }}>
-        <div style={{ color: 'var(--text-muted)', marginBottom: 16, fontWeight: 700 }}>No active adjudication result available.</div>
+        <div style={{ color: 'var(--text-muted)', marginBottom: 16, fontWeight: 800, fontSize: 16 }}>
+          NO ACTIVE ADJUDICATION RESULT AVAILABLE.
+        </div>
         <button onClick={onNewClaim} className="btn-primary">Submit a New Claim</button>
       </div>
     );
@@ -33,6 +35,7 @@ export default function BentoResultView({ result, onNewClaim }) {
 
   const isDeny = recommended_action.toLowerCase() === 'deny';
   const isRepair = recommended_action.toLowerCase() === 'repair';
+  const severityScore = Number(vision_summary.severity_score) || 9;
 
   const handleCopyExplanation = () => {
     navigator.clipboard.writeText(decision_explanation);
@@ -48,26 +51,26 @@ export default function BentoResultView({ result, onNewClaim }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 24,
-        padding: '16px 20px',
+        padding: '18px 24px',
         backgroundColor: 'var(--color-white)',
         border: 'var(--border-heavy)',
         borderRadius: 'var(--radius-brutal)',
-        boxShadow: 'var(--shadow-brutal)'
+        boxShadow: 'var(--shadow-lg)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{
             backgroundColor: 'var(--color-black)',
             color: 'var(--color-white)',
-            padding: '4px 8px',
+            padding: '5px 10px',
             borderRadius: 'var(--radius-brutal)',
             fontFamily: 'var(--font-mono)',
             fontSize: 13,
-            fontWeight: 800
+            fontWeight: 900
           }}>
             {claim_id}
           </div>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700 }}>
-            // MULTI-AGENT ADJUDICATION REPORT
+          <span style={{ fontSize: 13, color: 'var(--color-black)', fontWeight: 800 }}>
+            // MULTI-AGENT CONSENSUS REPORT
           </span>
         </div>
 
@@ -76,8 +79,8 @@ export default function BentoResultView({ result, onNewClaim }) {
             Process Another Claim
           </button>
           <button onClick={handleCopyExplanation} className="btn-secondary">
-            {copied ? <Check size={14} strokeWidth={2.5} /> : <Copy size={14} strokeWidth={2.5} />}
-            <span>{copied ? 'Copied' : 'Copy Summary'}</span>
+            {copied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={2.5} />}
+            <span>{copied ? 'Copied to Clipboard' : 'Copy Summary'}</span>
           </button>
         </div>
       </div>
@@ -88,64 +91,70 @@ export default function BentoResultView({ result, onNewClaim }) {
         {/* TILE 1: Primary Outcome & Decision Hero (5 cols) */}
         <div className="bento-card bento-col-5" style={{
           backgroundColor: isDeny ? 'var(--neo-red)' : 'var(--neo-green)',
-          color: isDeny ? 'var(--color-white)' : 'var(--color-black)'
+          color: isDeny ? 'var(--color-white)' : 'var(--color-black)',
+          boxShadow: isDeny ? '6px 6px 0px #050505' : '6px 6px 0px #050505'
         }}>
           <div className="bento-card-header" style={{ borderColor: 'var(--color-black)' }}>
             <div className="bento-card-title" style={{ color: isDeny ? 'var(--color-white)' : 'var(--color-black)' }}>
-              <ShieldAlert size={16} strokeWidth={2.5} />
-              <span>Adjudication Outcome</span>
+              <ShieldAlert size={18} strokeWidth={2.5} />
+              <span>Adjudication Verdict</span>
             </div>
-            <div className={`status-pill ${route === 'auto' ? (isDeny ? 'status-pill-deny' : 'status-pill-approve') : 'status-pill-verify'}`} style={{
+            <div style={{
               backgroundColor: 'var(--color-black)',
               color: 'var(--color-white)',
-              borderColor: 'var(--color-black)'
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-brutal)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              fontWeight: 900,
+              boxShadow: '2px 2px 0px rgba(0,0,0,0.3)'
             }}>
               {route === 'auto' ? 'AUTO-CLOSED' : route.toUpperCase()}
             </div>
           </div>
 
-          <div style={{ marginTop: 'auto', marginBottom: 'auto', padding: '14px 0' }}>
+          <div style={{ marginTop: 'auto', marginBottom: 'auto', padding: '16px 0' }}>
             <div style={{
               fontSize: 11,
-              fontWeight: 800,
+              fontWeight: 900,
               color: isDeny ? '#FFE5E5' : '#004D2E',
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               marginBottom: 4
             }}>
-              DISPATCH RECOMMENDATION
+              PRIMARY DISPATCH ACTION
             </div>
             <div style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 34,
+              fontSize: 36,
               fontWeight: 900,
               color: isDeny ? 'var(--color-white)' : 'var(--color-black)',
               letterSpacing: '-0.03em',
               lineHeight: 1.05,
-              marginBottom: 18
+              marginBottom: 20
             }}>
-              {isDeny ? 'POLICY DENIAL' : isRepair ? 'APPROVED REPAIR' : 'APPROVED REPLACEMENT'}
+              {isDeny ? 'POLICY DENIAL' : isRepair ? 'APPROVED FOR REPAIR' : 'APPROVED REPLACEMENT'}
             </div>
 
-            {/* Confidence Metric Block */}
+            {/* Confidence Metric Box */}
             <div style={{
               backgroundColor: 'var(--color-white)',
               color: 'var(--color-black)',
               border: 'var(--border-thick)',
               borderRadius: 'var(--radius-brutal)',
-              boxShadow: 'var(--shadow-brutal-sm)',
-              padding: '12px 16px',
+              boxShadow: '3px 3px 0px #050505',
+              padding: '14px 18px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Consensus Confidence</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-black)' }}>
-                  Multi-Agent Validation
+                <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Consensus Confidence</div>
+                <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--color-black)' }}>
+                  Multi-Factor Validation
                 </div>
               </div>
-              <div className="font-mono" style={{ fontSize: 26, fontWeight: 900, color: 'var(--color-black)' }}>
+              <div className="font-mono" style={{ fontSize: 30, fontWeight: 900, color: 'var(--color-black)' }}>
                 {overall_confidence}%
               </div>
             </div>
@@ -153,12 +162,12 @@ export default function BentoResultView({ result, onNewClaim }) {
 
           <div className="font-mono" style={{
             fontSize: 11,
-            fontWeight: 700,
+            fontWeight: 800,
             color: isDeny ? 'var(--color-white)' : 'var(--color-black)',
             paddingTop: 12,
             borderTop: 'var(--border-thick)'
           }}>
-            PATH: IMMEDIATE CUSTOMER NOTICE GENERATED
+            PATH: IMMEDIATE CUSTOMER EXPLANATION DISPATCHED
           </div>
         </div>
 
@@ -166,11 +175,19 @@ export default function BentoResultView({ result, onNewClaim }) {
         <div className="bento-card bento-col-7">
           <div className="bento-card-header">
             <div className="bento-card-title">
-              <CheckCircle2 size={16} strokeWidth={2.5} color="var(--color-black)" />
-              <span>Evidence Attribution Matrix (100% Weight)</span>
+              <CheckCircle2 size={18} strokeWidth={2.5} color="var(--color-black)" />
+              <span>Evidence Attribution Matrix (Attribution Ledger)</span>
             </div>
-            <span className="font-mono" style={{ fontSize: 11, fontWeight: 800, color: 'var(--color-black)' }}>
-              LEDGER AUDIT
+            <span className="font-mono" style={{
+              backgroundColor: 'var(--neo-green)',
+              color: 'var(--color-black)',
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-brutal)',
+              border: '1.5px solid #050505',
+              fontSize: 11,
+              fontWeight: 900
+            }}>
+              TOTAL 100%
             </span>
           </div>
 
@@ -186,7 +203,7 @@ export default function BentoResultView({ result, onNewClaim }) {
                   backgroundColor: 'var(--surface-subtle)',
                   borderRadius: 'var(--radius-brutal)',
                   border: 'var(--border-thin)',
-                  boxShadow: '2px 2px 0px #000000',
+                  boxShadow: '2px 2px 0px #050505',
                   fontSize: 13
                 }}
               >
@@ -194,14 +211,14 @@ export default function BentoResultView({ result, onNewClaim }) {
                   <span className="font-mono" style={{
                     backgroundColor: 'var(--color-black)',
                     color: 'var(--color-white)',
-                    padding: '2px 6px',
+                    padding: '3px 7px',
                     borderRadius: 'var(--radius-brutal)',
-                    fontWeight: 800,
-                    fontSize: 11
+                    fontWeight: 900,
+                    fontSize: 12
                   }}>
                     {ev.weight}%
                   </span>
-                  <span style={{ color: 'var(--color-black)', fontWeight: 700 }}>
+                  <span style={{ color: 'var(--color-black)', fontWeight: 800 }}>
                     {ev.factor}
                   </span>
                 </div>
@@ -209,10 +226,10 @@ export default function BentoResultView({ result, onNewClaim }) {
                 <div>
                   <span className="font-mono" style={{
                     fontSize: 11,
-                    fontWeight: 800,
-                    padding: '2px 8px',
+                    fontWeight: 900,
+                    padding: '3px 8px',
                     borderRadius: 'var(--radius-brutal)',
-                    border: '1.5px solid #000000',
+                    border: '1.5px solid #050505',
                     backgroundColor: ev.impact.includes('Negative') ? 'var(--neo-red)' : 'var(--neo-green)',
                     color: ev.impact.includes('Negative') ? 'var(--color-white)' : 'var(--color-black)'
                   }}>
@@ -225,14 +242,14 @@ export default function BentoResultView({ result, onNewClaim }) {
 
           <div style={{
             marginTop: 'auto',
-            paddingTop: 12,
+            paddingTop: 14,
             borderTop: 'var(--border-thick)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>Multi-Factor Attribution Verified</span>
-            <span className="font-mono" style={{ fontSize: 11, fontWeight: 800, color: '#00A86B' }}>DAG 100% PASS</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)' }}>Multi-Agent Weighted Attribution Verified</span>
+            <span className="font-mono" style={{ fontSize: 11, fontWeight: 900, color: '#00A86B' }}>DAG STATUS: PASS</span>
           </div>
         </div>
 
@@ -243,44 +260,44 @@ export default function BentoResultView({ result, onNewClaim }) {
               <FileText size={16} strokeWidth={2.5} />
               <span>Document Extraction</span>
             </div>
-            <span className="status-pill status-pill-approve" style={{ fontSize: 10 }}>
+            <span className="sticker-badge sticker-badge-approve" style={{ fontSize: 10 }}>
               VERIFIED
             </span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Product Name</div>
-              <div style={{ fontWeight: 800, color: 'var(--color-black)' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Product Name</div>
+              <div style={{ fontWeight: 900, color: 'var(--color-black)' }}>
                 {document_summary.product_name || 'Evidson Audio X55i Earphones'}
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Purchase Date</div>
-                <div className="font-mono" style={{ fontWeight: 800, color: 'var(--color-black)' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Purchase Date</div>
+                <div className="font-mono" style={{ fontWeight: 900, color: 'var(--color-black)' }}>
                   {document_summary.purchase_date || '2018-10-06'}
                 </div>
               </div>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Amount Paid</div>
-                <div className="font-mono" style={{ fontWeight: 800, color: 'var(--color-black)' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Amount Paid</div>
+                <div className="font-mono" style={{ fontWeight: 900, color: 'var(--color-black)' }}>
                   ₹{document_summary.price || 549} {document_summary.currency || 'INR'}
                 </div>
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Seller & Platform</div>
-              <div style={{ color: 'var(--color-black)', fontWeight: 600 }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Seller & Platform</div>
+              <div style={{ color: 'var(--color-black)', fontWeight: 700 }}>
                 {document_summary.retailer || 'Amazon.in (Revnova Technology)'}
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Tamper Detection</div>
-              <div style={{ color: '#00A86B', fontWeight: 800 }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Tamper Detection</div>
+              <div style={{ color: '#00A86B', fontWeight: 900 }}>
                 {document_summary.tamper_flag ? 'TAMPER ALERT' : 'No Alteration Detected (Authentic)'}
               </div>
             </div>
@@ -294,36 +311,52 @@ export default function BentoResultView({ result, onNewClaim }) {
               <Eye size={16} strokeWidth={2.5} />
               <span>Vision Damage</span>
             </div>
-            <span className="status-pill status-pill-deny" style={{ fontSize: 10 }}>
-              SEVERITY {vision_summary.severity_score || 9}/10
+            <span className="sticker-badge sticker-badge-deny" style={{ fontSize: 10 }}>
+              SEVERITY {severityScore}/10
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13 }}>
+            {/* Stepped Severity Equalizer */}
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Defect Description</div>
-              <div style={{ color: 'var(--color-black)', fontWeight: 700 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Damage Severity</span>
+                <span className="font-mono" style={{ fontSize: 11, fontWeight: 900, color: 'var(--neo-red)' }}>{severityScore} / 10</span>
+              </div>
+              <div className="severity-bar">
+                {Array.from({ length: 10 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`severity-block ${idx < severityScore ? 'active-red' : ''}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Defect Description</div>
+              <div style={{ color: 'var(--color-black)', fontWeight: 800 }}>
                 {vision_summary.damage_type || 'Cracked earbud casing exposing wires; stripped cable near 3.5mm jack'}
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Assessed Cause</div>
-              <div style={{ color: 'var(--neo-red)', fontWeight: 800 }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Assessed Cause</div>
+              <div style={{ color: 'var(--neo-red)', fontWeight: 900 }}>
                 {vision_summary.likely_cause === 'accidental_damage' ? 'Accidental Physical Damage (Uncovered)' : vision_summary.likely_cause}
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Authenticity</div>
-                <div className="font-mono" style={{ color: '#00A86B', fontWeight: 800 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Authenticity</div>
+                <div className="font-mono" style={{ color: '#00A86B', fontWeight: 900 }}>
                   {vision_summary.authenticity_confidence || 95}% (Authentic)
                 </div>
               </div>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Stock Flags</div>
-                <div style={{ color: 'var(--color-black)', fontWeight: 600 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Stock Flags</div>
+                <div style={{ color: 'var(--color-black)', fontWeight: 700 }}>
                   None detected
                 </div>
               </div>
@@ -338,7 +371,7 @@ export default function BentoResultView({ result, onNewClaim }) {
               <Calendar size={16} strokeWidth={2.5} />
               <span>Warranty Eligibility</span>
             </div>
-            <span className="status-pill status-pill-deny" style={{ fontSize: 10 }}>
+            <span className="sticker-badge sticker-badge-deny" style={{ fontSize: 10 }}>
               EXPIRED
             </span>
           </div>
@@ -346,30 +379,30 @@ export default function BentoResultView({ result, onNewClaim }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Policy Window</div>
-                <div className="font-mono" style={{ color: 'var(--color-black)', fontWeight: 800 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Policy Window</div>
+                <div className="font-mono" style={{ color: 'var(--color-black)', fontWeight: 900 }}>
                   {warranty_summary.policy_period_months || 6} Months (Standard)
                 </div>
               </div>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Policy Cutoff</div>
-                <div className="font-mono" style={{ color: 'var(--neo-red)', fontWeight: 800 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Policy Cutoff</div>
+                <div className="font-mono" style={{ color: 'var(--neo-red)', fontWeight: 900 }}>
                   06-Apr-2019
                 </div>
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Time Elapsed Since Purchase</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Time Elapsed Since Purchase</div>
               <div className="font-mono" style={{ color: 'var(--neo-red)', fontWeight: 900 }}>
                 {warranty_summary.days_overdue || 2880} Days Overdue ({'>'} 7 Years)
               </div>
             </div>
 
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>Eligibility Gate</div>
-              <div style={{ color: 'var(--neo-red)', fontWeight: 700 }}>
-                Outside Return & Warranty Coverage
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>Eligibility Gate</div>
+              <div style={{ color: 'var(--neo-red)', fontWeight: 800 }}>
+                Outside Return & Warranty Coverage Window
               </div>
             </div>
           </div>
@@ -382,31 +415,31 @@ export default function BentoResultView({ result, onNewClaim }) {
               <FileText size={16} strokeWidth={2.5} />
               <span>Full Decision Narrative & Auditor Rationale</span>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>OPERATIONS AUDIT</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)' }}>OPERATIONS AUDIT</span>
           </div>
 
           <div style={{
             backgroundColor: 'var(--surface-subtle)',
             border: 'var(--border-thin)',
             borderRadius: 'var(--radius-brutal)',
-            padding: 16,
+            padding: 18,
             fontSize: 13,
             lineHeight: 1.6,
             color: 'var(--color-black)',
-            fontWeight: 500,
+            fontWeight: 600,
             whiteSpace: 'pre-line'
           }}>
             {decision_explanation}
           </div>
 
-          {/* Raw Pipeline Output Drawer */}
+          {/* Raw Pipeline Output Drawer Toggle */}
           <div style={{ marginTop: 14 }}>
             <button
               onClick={() => setShowRawOutput(!showRawOutput)}
               className="btn-secondary"
               style={{
                 fontSize: 11,
-                padding: '6px 10px',
+                padding: '6px 12px',
                 border: 'var(--border-thin)'
               }}
             >
@@ -417,12 +450,12 @@ export default function BentoResultView({ result, onNewClaim }) {
             {showRawOutput && (
               <pre className="font-mono" style={{
                 marginTop: 12,
-                padding: 14,
+                padding: 16,
                 backgroundColor: 'var(--color-black)',
                 border: 'var(--border-thick)',
                 borderRadius: 'var(--radius-brutal)',
                 fontSize: 11,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: 'var(--neo-green)',
                 maxHeight: 240,
                 overflowY: 'auto',
@@ -441,7 +474,7 @@ export default function BentoResultView({ result, onNewClaim }) {
               <XCircle size={16} strokeWidth={2.5} />
               <span>Risk & Fraud Flags</span>
             </div>
-            <span className="font-mono" style={{ fontSize: 11, fontWeight: 800, color: 'var(--neo-red)' }}>
+            <span className="font-mono" style={{ fontSize: 11, fontWeight: 900, color: 'var(--neo-red)' }}>
               {risk_flags.length} DETECTED
             </span>
           </div>
@@ -454,18 +487,18 @@ export default function BentoResultView({ result, onNewClaim }) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  padding: '8px 12px',
+                  padding: '10px 12px',
                   borderRadius: 'var(--radius-brutal)',
                   backgroundColor: 'var(--neo-red-light)',
                   border: '1.5px solid var(--neo-red)',
-                  boxShadow: '2px 2px 0px #FF3B30',
+                  boxShadow: '3px 3px 0px #FF3B30',
                   color: 'var(--neo-red)',
                   fontSize: 12,
                   fontFamily: 'var(--font-mono)',
-                  fontWeight: 800
+                  fontWeight: 900
                 }}
               >
-                <XCircle size={14} strokeWidth={2.5} />
+                <XCircle size={15} strokeWidth={2.5} />
                 <span>{flag}</span>
               </div>
             ))}
