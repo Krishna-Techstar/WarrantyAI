@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap');
+
+:root {
+  /* Elevated Neo-Brutalist Palette: Black, White, Red, Green */
+  --bg-canvas: #F4F4EE;
+  --surface-card: #FFFFFF;
+  --surface-subtle: #EDEDE4;
+  --surface-hover: #E3E3D8;
+  
+  --color-black: #050505;
+  --color-white: #FFFFFF;
+  
+  --neo-green: #00E599;
+  --neo-green-dark: #00A86B;
+  --neo-green-light: #E6FAF2;
+  
+  --neo-red: #FF3B30;
+  --neo-red-dark: #D62828;
+  --neo-red-light: #FFEBEA;
+  
+  --neo-yellow: #FFD600;
+  
+  --border-thick: 3px solid #050505;
+  --border-heavy: 3.5px solid #050505;
+  --border-thin: 2px solid #050505;
+
+  --text-primary: #050505;
+  --text-secondary: #222222;
+  --text-muted: #666666;
+
+  /* Hard Offset Brutalist Shadows */
+  --shadow-sm: 2px 2px 0px #050505;
+  --shadow-md: 4px 4px 0px #050505;
+  --shadow-lg: 6px 6px 0px #050505;
+  --shadow-xl: 8px 8px 0px #050505;
+  --shadow-green: 5px 5px 0px #00E599;
+  --shadow-red: 5px 5px 0px #FF3B30;
+
+  /* Typography */
+  --font-sans: 'Space Grotesk', -apple-system, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', var(--font-sans);
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --radius-brutal: 4px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  background-image: radial-gradient(#050505 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-black);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Accessible Keyboard Focus Ring */
+:focus-visible {
+  outline: 3px solid var(--color-black);
+  outline-offset: 3px;
+}
+
+/* Bento Grid System */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+
+.bento-col-4 { grid-column: span 4; }
+.bento-col-5 { grid-column: span 5; }
+.bento-col-6 { grid-column: span 6; }
+.bento-col-7 { grid-column: span 7; }
+.bento-col-8 { grid-column: span 8; }
+.bento-col-12 { grid-column: span 12; }
+
+@media (max-width: 1024px) {
+  .bento-col-4, .bento-col-5, .bento-col-6, .bento-col-7, .bento-col-8 {
+    grid-column: span 12;
+  }
+}
+
+/* Elevated Neo-Brutalist Card */
+.bento-card {
+  background-color: var(--surface-card);
+  border: var(--border-heavy);
+  border-radius: var(--radius-brutal);
+  padding: 22px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.bento-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.bento-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: var(--border-thick);
+}
+
+.bento-card-title {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-black);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Neo-Brutalist Sticker Badges */
+.sticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border: var(--border-thin);
+  border-radius: var(--radius-brutal);
+  box-shadow: var(--shadow-sm);
+}
+
+.sticker-badge-deny {
+  background-color: var(--neo-red);
+  color: var(--color-white);
+  box-shadow: 2px 2px 0px #050505;
+}
+
+.sticker-badge-approve {
+  background-color: var(--neo-green);
+  color: var(--color-black);
+  box-shadow: 2px 2px 0px #050505;
+}
+
+.sticker-badge-black {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+/* Interactive Neo-Brutalist Buttons */
+.btn-primary {
+  background-color: var(--neo-green);
+  color: var(--color-black);
+  border: var(--border-heavy);
+  border-radius: var(--radius-brutal);
+  padding: 12px 24px;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.1s ease;
+}
+
+.btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+  background-color: #1affad;
+}
+
+.btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  border: var(--border-thick);
+  border-radius: var(--radius-brutal);
+  padding: 9px 16px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.1s ease;
+}
+
+.btn-secondary:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface-subtle);
+}
+
+.btn-secondary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0px #050505;
+}
+
+.btn-red {
+  background-color: var(--neo-red);
+  color: var(--color-white);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-red:hover {
+  background-color: #e62e24;
+}
+
+/* Stepped Severity Equalizer Bars */
+.severity-bar {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  height: 12px;
+}
+
+.severity-block {
+  border: 1.5px solid #050505;
+  background-color: var(--surface-subtle);
+  border-radius: 1px;
+}
+
+.severity-block.active-red {
+  background-color: var(--neo-red);
+}
+
+.severity-block.active-green {
+  background-color: var(--neo-green);
+}
+
+/* Custom Brutalist Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-subtle);
+  border-left: var(--border-thin);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-black);
+  border: 2px solid var(--color-white);
+}

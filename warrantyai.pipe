@@ -12,8 +12,8 @@
       },
       "ui": {
         "position": {
-          "x": 110,
-          "y": 340
+          "x": 40,
+          "y": 320
         },
         "measured": {
           "width": 150,
@@ -378,8 +378,8 @@
       },
       "ui": {
         "position": {
-          "x": 450,
-          "y": -80
+          "x": 490,
+          "y": -120
         },
         "measured": {
           "width": 150,
@@ -407,7 +407,7 @@
       },
       "ui": {
         "position": {
-          "x": 650,
+          "x": 670,
           "y": -120
         },
         "measured": {
@@ -444,8 +444,8 @@
       },
       "ui": {
         "position": {
-          "x": 860,
-          "y": -80
+          "x": 1460,
+          "y": -100
         },
         "measured": {
           "width": 150,
@@ -470,8 +470,8 @@
       },
       "ui": {
         "position": {
-          "x": 1060,
-          "y": -70
+          "x": 1660,
+          "y": -100
         },
         "measured": {
           "width": 150,
@@ -497,8 +497,8 @@
       },
       "ui": {
         "position": {
-          "x": 980,
-          "y": 510
+          "x": 1660,
+          "y": 200
         },
         "measured": {
           "width": 150,
@@ -526,8 +526,8 @@
       },
       "ui": {
         "position": {
-          "x": 1530,
-          "y": 190
+          "x": 1860,
+          "y": 200
         },
         "measured": {
           "width": 150,
@@ -575,7 +575,7 @@
       },
       "ui": {
         "position": {
-          "x": 1720,
+          "x": 2060,
           "y": 200
         },
         "measured": {
@@ -610,8 +610,8 @@
       },
       "ui": {
         "position": {
-          "x": 1940,
-          "y": 190
+          "x": 2260,
+          "y": 200
         },
         "measured": {
           "width": 150,
@@ -636,8 +636,8 @@
       },
       "ui": {
         "position": {
-          "x": 2150,
-          "y": 210
+          "x": 2460,
+          "y": 200
         },
         "measured": {
           "width": 150,
@@ -654,7 +654,7 @@
       ]
     }
   ],
-  "project_id": "88665959-393b-4344-ba6a-943ddd210bf1",
+  "project_id": "aa7dff90-6268-4bd6-a6e4-7e809a9c485b",
   "version": 1,
   "isLocked": false,
   "snapToGrid": true,
@@ -662,5 +662,5 @@
     10,
     10
   ],
-  "docRevision": 20
+  "docRevision": 6
 }

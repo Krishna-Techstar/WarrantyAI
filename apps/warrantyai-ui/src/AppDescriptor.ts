@@ -19,9 +19,9 @@ import type { AppDescriptor } from 'shell';
 import App from './App';
 
 const descriptor: AppDescriptor = {
-	id: 'local.warrantyai',
-	name: 'WarrantyAI',
-	branding: { appName: 'WarrantyAI' },
+	id: 'krishna.warranty-ai',
+	name: 'Warranty AI',
+	branding: { appName: 'Warranty AI' },
 	app: App,
 };
 
