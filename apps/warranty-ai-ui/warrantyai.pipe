@@ -236,8 +236,8 @@
       },
       "ui": {
         "position": {
-          "x": 1060,
-          "y": 200
+          "x": 1070,
+          "y": 220
         },
         "measured": {
           "width": 150,
@@ -662,5 +662,5 @@
     10,
     10
   ],
-  "docRevision": 20
+  "docRevision": 22
 }

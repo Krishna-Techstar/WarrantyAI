@@ -1,5 +1,5 @@
 // =============================================================================
-// WarrantyAI — Root Component for RocketRide App (warranty-ai-ui)
+// WarrantyAI — Root Component for RocketRide App Shell
 // =============================================================================
 
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ import BentoResultView from './components/BentoResultView';
 import HumanReviewQueue from './components/HumanReviewQueue';
 import ErrorModal from './components/ErrorModal';
 
-export const App: React.FC<ShellAppProps> = () => {
+export const App: React.FC<ShellAppProps> = ({ isConnected, identity }) => {
   const [activeTab, setActiveTab] = useState<'submit' | 'result' | 'queue'>('submit');
   const [isProcessing, setIsProcessing] = useState(false);
   const [adjudicationResult, setAdjudicationResult] = useState<any>(null);
@@ -72,44 +72,50 @@ export const App: React.FC<ShellAppProps> = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-canvas)' }}>
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        pendingCount={pendingCount}
-        onNewClaim={() => setActiveTab('submit')}
-      />
+    <AppLayout showStatus={false}>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-canvas)' }}>
+        {/* Top Ops Navigation Bar */}
+        <Header
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          pendingCount={pendingCount}
+          onNewClaim={() => setActiveTab('submit')}
+          userName={identity?.displayName || 'Krishnakant Sharma'}
+          isConnected={isConnected}
+        />
 
-      <main style={{ paddingBottom: 64 }}>
-        {isProcessing && <ProcessingView />}
+        {/* Main Content Area */}
+        <main style={{ flex: 1, paddingBottom: 48 }}>
+          {isProcessing ? (
+            <ProcessingView />
+          ) : activeTab === 'submit' ? (
+            <ClaimSubmissionForm
+              onSubmit={handleClaimSubmit}
+              isProcessing={isProcessing}
+            />
+          ) : activeTab === 'result' ? (
+            <BentoResultView
+              result={adjudicationResult}
+              onNewClaim={() => setActiveTab('submit')}
+            />
+          ) : activeTab === 'queue' ? (
+            <HumanReviewQueue
+              onInspectClaim={(claim: any) => {
+                setAdjudicationResult(claim);
+                setActiveTab('result');
+              }}
+            />
+          ) : null}
+        </main>
 
-        {!isProcessing && activeTab === 'submit' && (
-          <ClaimSubmissionForm onSubmit={handleClaimSubmit} isProcessing={isProcessing} />
-        )}
-
-        {!isProcessing && activeTab === 'result' && (
-          <BentoResultView
-            result={adjudicationResult}
-            onNewClaim={() => setActiveTab('submit')}
-          />
-        )}
-
-        {!isProcessing && activeTab === 'queue' && (
-          <HumanReviewQueue
-            onInspectClaim={(claim: any) => {
-              setAdjudicationResult(claim);
-              setActiveTab('result');
-            }}
-          />
-        )}
-      </main>
-
-      <ErrorModal
-        error={error}
-        onClose={() => setError(null)}
-        onRetry={handleRetry}
-      />
-    </div>
+        {/* Loud Zero-Mock Error Modal */}
+        <ErrorModal
+          error={error}
+          onClose={() => setError(null)}
+          onRetry={handleRetry}
+        />
+      </div>
+    </AppLayout>
   );
 };
 

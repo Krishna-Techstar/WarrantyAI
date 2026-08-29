@@ -1,7 +1,14 @@
 import React from 'react';
-import { ShieldCheck, Layers, Clock, PlusCircle, Sparkles, Activity } from 'lucide-react';
+import { ShieldCheck, Layers, Clock, PlusCircle, User, Activity } from 'lucide-react';
 
-export default function Header({ activeTab, setActiveTab, pendingCount, onNewClaim }) {
+export default function Header({ 
+  activeTab, 
+  setActiveTab, 
+  pendingCount, 
+  onNewClaim,
+  userName = 'Krishnakant Sharma',
+  isConnected = true
+}) {
   return (
     <>
       {/* Top Brutalist Ticker Marquee Strip */}
@@ -18,13 +25,13 @@ export default function Header({ activeTab, setActiveTab, pendingCount, onNewCla
         letterSpacing: '0.06em'
       }}>
         <div style={{ display: 'flex', gap: 32, justifyContent: 'center', alignItems: 'center' }}>
-          <span>● ROCKETRIDE DAP: 100% ONLINE</span>
+          <span>● ROCKETRIDE STAGING: ONLINE</span>
           <span>//</span>
-          <span>⚡ REAL GROQ-120B INFERENCE</span>
+          <span>👤 USER: {userName.toUpperCase()}</span>
+          <span>//</span>
+          <span>⚡ LIVE MULTI-AGENT DAG ACTIVE</span>
           <span>//</span>
           <span>🛡️ ZERO MOCK POLICY (AGENTS.MD)</span>
-          <span>//</span>
-          <span>⚖️ 5-AGENT DAG ACTIVE</span>
         </div>
       </div>
 
@@ -100,7 +107,7 @@ export default function Header({ activeTab, setActiveTab, pendingCount, onNewCla
                   letterSpacing: '0.06em',
                   marginTop: 3
                 }}>
-                  MULTI-AGENT ADJUDICATION // v1.0
+                  ROCKETRIDE STAGING APP // v1.0
                 </div>
               </div>
             </div>
@@ -112,7 +119,7 @@ export default function Header({ activeTab, setActiveTab, pendingCount, onNewCla
               margin: '0 8px'
             }} />
 
-            {/* Live Engine Badge */}
+            {/* Live User & Staging Badge */}
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -135,7 +142,7 @@ export default function Header({ activeTab, setActiveTab, pendingCount, onNewCla
                 border: '2px solid #050505',
                 boxShadow: '0 0 6px var(--neo-green)'
               }} />
-              <span>DAP ENGINE // GROQ-120B</span>
+              <span>CONNECTED: {userName}</span>
             </div>
           </div>
 
